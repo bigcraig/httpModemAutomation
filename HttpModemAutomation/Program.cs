@@ -33,6 +33,36 @@ namespace HttpModemAutomation
             return (_acspost);
         }
 
+        static void vlanConfiguration()
+        {
+            var modem = new Browser();
+
+            var modemURL = "http://192.168.20.1/qinetsetup.html";
+            modem.Navigate(modemURL);
+            //    Console.Write("get url");
+           //    modem.BasicAuthenticationLogin("Broadband Router","admin","admin");
+            modem.BasicAuthenticationLogin("192.168.20.1", "admin", "admin");
+
+
+            modem.Navigate(modemURL);
+            //     Console.Write(modem.CurrentHtml);
+            var html = modem.CurrentHtml;
+            string sessionKey = getSessionID(html);
+            // post wlan type
+            modemURL = "http://192.168.20.1/qvdslwanmode.cgi?wanType=2&sessionKey=" + sessionKey;
+            modem.Navigate(modemURL);
+            html = modem.CurrentHtml;
+            sessionKey = getSessionID(html);
+            modemURL = "http://192.168.20.1/qvdslppp.cgi?ntwkPrtcl=0&enblOnDemand=0&pppTimeOut=0&enblv4=1&useStaticIpAddress=0&pppIpExtension=0&enblFirewall=1&enblNat=1&enblIgmp=1&keepalive=1&keepalivetime=5&alivemaxfail=30&enVlanMux=1&vlanMuxId=69&vlanMuxPr=0&enblPppDebug=0&maxMtu=1492&keepalive=0&enblv6=0&pppAuthErrorRetry=0&pppAuthMethod=0&sessionKey=" + sessionKey;
+            modem.Navigate(modemURL);
+            html = modem.CurrentHtml;
+            sessionKey = getSessionID(html);
+            modemURL = "http://192.168.20.1/qsetup.cmd?pppUserName=craignz&pppPassword=craigpassword&portId=0&ptmPriorityNorm=1&ptmPriorityHigh=1&connMode=1&burstsize=3000&enblQos=1&grpPrec=8&grpAlg=WRR&grpWght=1&prec=8&alg=WRR&wght=1&sessionKey=" + sessionKey;
+            modem.Navigate(modemURL);
+           
+
+        }
+
         static void Main(string[] args)
 
         {
@@ -62,6 +92,8 @@ namespace HttpModemAutomation
             var getstringACS = ACSConfigString(sessionKey);
             modemURL = modemURL + getstringACS;
             modem.Navigate(modemURL);
+            vlanConfiguration();
+            // need to do 4 posts to configure vlan
         }
     }
 }
